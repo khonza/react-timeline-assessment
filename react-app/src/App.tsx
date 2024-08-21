@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import logo from './logo.svg';
-import { TimelineItem } from './models/timeline.interface';
+import { ApiResponse } from './models/timeline.interface';
 import './App.css';
 
 function App() {
-  const [data, setData] = useState<Array<TimelineItem>>([]);
+  const [data, setData] = useState<ApiResponse>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     axios.get('https://arthurfrost.qflo.co.za/php/getTimeline.php')  // Replace with your endpoint URL
       .then(response => {
-        setData(response.data.Timeline);  // Update state with the fetched data
+        setData(response.data);  // Update state with the fetched data
         setLoading(false);  // Set loading to false once data is fetched
       })
       .catch(err => {
@@ -28,10 +27,15 @@ function App() {
 
   return (
     <div className="App">
+      {data && data.Body && data.Body[0] && data.Body[0].About ? (
+        <div className='about-header' dangerouslySetInnerHTML={{ __html: data.Body[0].About }} />
+      ) : (
+        <div>No content available</div>
+      )}
       <h1>Data</h1>
-      {data && Array.isArray(data) && data.length > 0 ? (
+      {data?.Timeline && Array.isArray(data.Timeline) && data.Timeline.length > 0 ? (
         <ul>
-          {data.map((item, index) => (
+          {data?.Timeline.map((item, index) => (
             <li key={index}>
               <label>ID : <strong>{ item.Id}</strong></label>
               <label>Title : <strong>{ item.Title}</strong></label>

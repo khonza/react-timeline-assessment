@@ -1,3 +1,20 @@
+export interface ApiResponse {
+    Body: BodyResponse[];
+    Timeline: TimelineItem[];
+}
+
+export interface BodyResponse {
+    About: string;
+    Background: string;
+    BackgroundOpacity: number;
+    CSS: null;
+    Epoch: number;
+    Id: number;
+    JS: string;
+    Status: number;
+    createDate: CreatedDateObj;
+}
+
 export interface TimelineItem {
     Id: string;
     Title: string;
@@ -15,4 +32,10 @@ export interface TimelineItem {
     Category: string;
     Epoch: number;
     AudioSize: number;
+}
+
+export interface CreatedDateObj {
+    date: string;
+    timezone: string;
+    timezone_type: number;
 }
