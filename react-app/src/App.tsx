@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Card from 'react-bootstrap/Card';
 import { ApiResponse } from './models/timeline.interface';
+import { RotatingLines } from "react-loader-spinner";
 import './App.css';
 
 function App() {
   const [data, setData] = useState<ApiResponse>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const resourceDir:string = 'https://arthurfrost.qflo.co.za/';
 
   useEffect(() => {
     axios.get('https://arthurfrost.qflo.co.za/php/getTimeline.php')  // Replace with your endpoint URL
@@ -21,41 +24,43 @@ function App() {
       });
   }, []);  // Empty dependency array means this runs once after the initial render
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="loader-spinner"><RotatingLines
+                        strokeColor="grey"
+                        strokeWidth="5"
+                        animationDuration="0.75"
+                        width="96"
+                        visible={true}
+                      /></div>;
   if (error) return <div>Error: {error}</div>;  // Display error message if request fails
 
 
   return (
     <div className="App">
       {data && data.Body && data.Body[0] && data.Body[0].About ? (
-        <div className='about-header' dangerouslySetInnerHTML={{ __html: data.Body[0].About }} />
+        <div id='about-header' dangerouslySetInnerHTML={{ __html: data.Body[0].About }} />
       ) : (
         <div>No content available</div>
       )}
-      <h1>Data</h1>
-      {data?.Timeline && Array.isArray(data.Timeline) && data.Timeline.length > 0 ? (
-        <ul>
-          {data?.Timeline.map((item, index) => (
-            <li key={index}>
-              <label>ID : <strong>{ item.Id}</strong></label>
-              <label>Title : <strong>{ item.Title}</strong></label>
-              <label>Media : <strong>{ item.Media}</strong></label>
-              <label>Description : <strong>{ item.Description}</strong></label>
-              <label>Image : <strong>{ item.Image}</strong></label>
-              <label>Icon : <strong>{ item.Icon}</strong></label>
-              <label>Audio : <strong>{ item.Audio}</strong></label>
-              <label>Remote ID : <strong>{ item.RemoteId}</strong></label>
-              <label>Status : <strong>{ item.Status}</strong></label>
-              <label>IsActive : <strong>{ item.IsActive}</strong></label>
-              <label>InId : <strong>{ item.InId}</strong></label>
-              <label>Create Date : <strong>{ item.CreateDate}</strong></label>
-              <label>Media Name : <strong>{ item.MediaName}</strong></label>
-              <label>Category : <strong>{ item.Category}</strong></label>
-              <label>Epoch : <strong>{ item.Epoch}</strong></label>
-              <label>Audio Size : <strong>{ item.AudioSize}</strong></label>
-            </li>
+      
+      { data?.Timeline && Array.isArray(data.Timeline) && data.Timeline.length > 0 ? (
+        <div className='timeline-card-container'>
+          { data?.Timeline.map((item, index) => (
+            <><Card id="timeline-card" key={ index }>
+              <Card.Img variant="top" src={ resourceDir + item.Image } />
+              <Card.Body>
+                <Card.Title>{ item.Category }</Card.Title>
+                <Card.Text>{ item.Description }</Card.Text>
+                <Card.Header>{ item.Title }</Card.Header>
+                <Card.Body><label>{ item.CreateDate }</label></Card.Body>
+                <audio controls>
+                  <source src={ resourceDir + item.Audio } type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+                <audio ></audio>
+              </Card.Body>
+            </Card></>
           ))}
-        </ul>
+        </div>
       ) : (
         <div>No data available</div>
       )}
